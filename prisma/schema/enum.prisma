@@ -1,0 +1,24 @@
+
+// ── Enums ──────────────────────────────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  VENDOR
+  ADMIN
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+enum Permission {
+  MANAGE_USERS
+  MANAGE_VENDORS
+  MANAGE_PRODUCTS
+  MANAGE_ORDERS
+  MANAGE_CATEGORIES
+  MANAGE_REVIEWS
+  VIEW_ANALYTICS
+  FULL_ACCESS
+}
