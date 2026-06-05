@@ -15,6 +15,7 @@ export const sendResponse = <T>(
 
 export const sendError = (
   res: Response,
+
   statusCode: number,
   message: string,
 ) => {

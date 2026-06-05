@@ -3,9 +3,11 @@ import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
 
 export const notFound = (
-  _req: Request,
-  _res: Response,
+  req: Request,
+  res: Response,
   next: NextFunction,
 ): void => {
-  throw new AppError(StatusCodes.NOT_FOUND, `Route ${_req.originalUrl}`);
+  next(
+    new AppError(StatusCodes.NOT_FOUND, `Your route ${req.originalUrl} not found`),
+  );
 };

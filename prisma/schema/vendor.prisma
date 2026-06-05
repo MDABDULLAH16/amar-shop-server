@@ -1,38 +1,40 @@
 model VendorProfile {
-  id                 String   @id @default(uuid())
-  userId             String   @unique
+  id     String @id @default(uuid())
+  userId String @unique
 
   // Shop identity
-  shopName           String   @unique
-  shopSlug           String   @unique   // URL: /shop/amar-shop
-  shopDescription    String?
-  shopLogo           String?
-  shopBanner         String?
+  subdomain       String  @unique
+  domain          String?  @unique
+  shopSlug        String  @unique // URL: /shop/amar-shop
+  shopDescription String?
+  shopLogo        String?
+  shopBanner      String?
 
   // Contact
-  phone              String?
-  businessEmail      String?
-  address            String?
-  city               String?
-  country            String?  @default("Bangladesh")
+  phone         String?
+  businessEmail String?
+  address       String?
+  city          String?
+  country       String? @default("Bangladesh")
 
   // Banking / payout
-  bankAccountName    String?
-  bankAccountNumber  String?
-  bankName           String?
-  mobileBankingType  String?   // bKash, Nagad, Rocket
+  bankAccountName     String?
+  bankAccountNumber   String?
+  bankName            String?
+  mobileBankingType   String? // bKash, Nagad, Rocket
   mobileBankingNumber String?
 
   // Status
-  isVerified         Boolean  @default(false)   // Admin verify করেছে?
-  isApproved         Boolean  @default(false)   // Sell করতে পারবে?
-  rating             Float    @default(0.0)
-  totalSales         Int      @default(0)
+  isVerified Boolean @default(false) // Admin verify করেছে?
+  isApproved Boolean @default(false) // Sell করতে পারবে?
+  rating     Float   @default(0.0)
+  totalSales Int     @default(0)
 
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customer CustomerProfile?
 
   @@map("vendor_profiles")
 }

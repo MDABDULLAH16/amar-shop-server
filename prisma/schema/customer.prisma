@@ -1,22 +1,24 @@
-
 model CustomerProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  phone          String?
-  dateOfBirth    DateTime?
-  gender         String?
+  id     String @id @default(uuid())
+  userId String @unique
+
+  phone       String?
+  dateOfBirth DateTime?
+  gender      String?
 
   // Default shipping address (inline — আলাদা Address table পরে বানাবো)
   defaultAddress String?
   city           String?
   state          String?
   postalCode     String?
-  country        String?  @default("Bangladesh")
+  country        String? @default("Bangladesh")
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  vendorId  String   @unique
 
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vendorProfile VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("customer_profiles")
 }

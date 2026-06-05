@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
-import { errorHandler } from "./middleware/errorHandler";
+import { globalErrorHandler } from "./middleware/errorHandler";
 import { notFound } from "./middleware/not-found";
+import router from "./routes/routes";
 // import userRoutes from "@/modules/user/user.route";
- 
 
 const app = express();
 
@@ -14,10 +14,10 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-// app.use("/api/users", userRoutes);
+app.use("/api/v1", router);
 
 // Health check
-app.get("/", (req, res) => {
+app.get("/helth", (req, res) => {
   res.json({ message: "Welcome to AmarShop" });
 });
 
@@ -25,6 +25,6 @@ app.get("/", (req, res) => {
 app.use(notFound);
 
 // Error handler (must be last)
-app.use(errorHandler);
+app.use(globalErrorHandler);
 
 export default app;
