@@ -5,6 +5,7 @@ declare global {
     interface Request {
       user: JwtPayload;
       vendorId: string;
+      subdomain :string
     }
   }
 }

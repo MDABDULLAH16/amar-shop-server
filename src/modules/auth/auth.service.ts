@@ -1,20 +1,24 @@
 import { User } from "@prisma/client";
 import { catchAsync } from "../../middleware/errorHandler";
 import { prisma } from "../../lib/prisma";
-import { hashPassword } from "../../utils/hash";
+import { comparePassword, hashPassword } from "../../utils/hash";
+import { AppError } from "../../utils/appError";
+import { StatusCodes } from "http-status-codes";
 
-const userRegister = catchAsync(async (payload: User) => {
-  const hashedPassword = await hashPassword(payload.password);
-  const user = await prisma.user.create({
-    data: {
-      email: payload.email,
-      password: hashedPassword,
-      name: payload.name,
-    },
+const userLogin = async (payload: User) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: { email: payload.email },
   });
+  const isMatchedPassword = await comparePassword(
+    payload.password,
+    user.password,
+  );
+  if (!isMatchedPassword) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "invalid User or Password");
+  }
   return user;
-});
+};
 
-export const userServices = {
-  userRegister,
+export const authServices = {
+  userLogin,
 };
