@@ -1,17 +1,25 @@
-
 model Product {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  stock       Int           @default(0)
-  status      ProductStatus @default(ACTIVE)
-  imageUrl    String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  userId String
- 
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  price         Float
+  stock         Int            @default(0)
+  status        ProductStatus  @default(ACTIVE)
+  images        ProductImage[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  isDeleted     Boolean        @default(false)
+  vendorId      String
+  vendorProfile VendorProfile  @relation(fields: [vendorId], references: [id])
 
   @@map("products")
+}
+
+model ProductImage {
+  id         String   @id @default(uuid())
+  url        String
+  isFeatured Boolean  @default(false)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
 }

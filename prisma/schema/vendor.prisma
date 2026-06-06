@@ -4,7 +4,7 @@ model VendorProfile {
 
   // Shop identity
   subdomain       String  @unique
-  domain          String?  @unique
+  domain          String? @unique
   shopSlug        String  @unique // URL: /shop/amar-shop
   shopDescription String?
   shopLogo        String?
@@ -33,8 +33,11 @@ model VendorProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user     User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  customer CustomerProfile?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  product Product[]
+
+  customer CustomerProfile[]
 
   @@map("vendor_profiles")
 }
