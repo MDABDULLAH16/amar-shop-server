@@ -8,8 +8,9 @@ export const authenticate = catchAsync(
   async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     const authHeader = req.headers.authorization;
     const headerToken = authHeader?.split(" ")[1];
-
     const cookieToken = req.cookies?.accessToken;
+    console.log('cc',cookieToken);
+    
 
     const token = headerToken || cookieToken;
     if (!token) {
@@ -28,6 +29,8 @@ export const authenticate = catchAsync(
 export const authorizeRoles =
   (...roles: string[]) =>
   (req: Request, _res: Response, next: NextFunction): void => {
+    console.log("authories roles", req.user.role);
+
     if (!req.user || !roles.includes(req.user.role)) {
       throw new AppError(
         StatusCodes.FORBIDDEN,

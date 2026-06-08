@@ -5,15 +5,19 @@ import { StatusCodes } from "http-status-codes";
 
 const productAdd = async (req: Request) => {
   const userId = req.user.userId;
+  console.log('product role',req.user.role);
+  
   const vendorAccount = await prisma.vendorProfile.findUnique({
     where: {
       userId: userId,
     },
   });
-  if (!vendorAccount) {
+  
+  //check vendor domain;
+  if (!vendorAccount || vendorAccount.subdomain !== req.subdomain) {
     throw new AppError(StatusCodes.NOT_FOUND, "vendor account not found");
   }
-  const vendorId = vendorAccount?.id;
+  const vendorId = vendorAccount.id;
 
   const payload = req.body;
   const { name, description, price, stock, images } = payload;

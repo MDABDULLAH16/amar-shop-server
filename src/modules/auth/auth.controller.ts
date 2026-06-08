@@ -4,7 +4,7 @@ import { authServices } from "./auth.service";
 import { sendResponse } from "../../utils/response";
 import { StatusCodes } from "http-status-codes";
 import { signToken } from "../../utils/jwt";
-import { tr } from "zod/locales";
+import { env } from "../../config/env";
 
 // multiple login (VENDOR,CUSTOMER,ADMIN);
 const loginUserReq = catchAsync(async (req: Request, res: Response) => {
@@ -18,21 +18,29 @@ const loginUserReq = catchAsync(async (req: Request, res: Response) => {
 
   // token generation
   const accessToken = signToken(payload);
-
   const refreshToken = signToken(payload);
 
-  // set cookie
+  const isProduction = env.NODE_ENV === "production";
+  const productionDomain = env.DOMAIN; // e.g., ".amarshop.com"
 
-  res.cookie("accessToken", accessToken, {
+  // ১. কমন কুকি অপশন (কোড ক্লিন রাখার জন্য)
+  const cookieOptions = {
     httpOnly: true,
-    secure: true,
+    secure: isProduction,
+    sameSite: "lax" as const,
+    domain: isProduction ? productionDomain : ".localhost",
+  };
+
+  // ২. set accessToken cookie (মেয়াদ: ১ দিন)
+  res.cookie("accessToken", accessToken, {
+    ...cookieOptions,
     maxAge: 1000 * 60 * 60 * 24,
   });
 
+  // ৩. set refreshToken cookie (মেয়াদ: ৭ দিন এবং ডোমেন ফিক্সড)
   res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    maxAge: 1000 * 60 * 60 * 24,
+    ...cookieOptions,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
   });
 
   // dynamic success message
@@ -42,6 +50,7 @@ const loginUserReq = catchAsync(async (req: Request, res: Response) => {
       role: result.role,
       email: result.email,
     },
+    accessToken,
   });
 });
 
