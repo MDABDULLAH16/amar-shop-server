@@ -9,4 +9,5 @@ export const env = {
   BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS,
   JWT_SECRET: process.env.JWT_SECRET as string,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
+  DOMAIN: process.env.DOMAIN,
 };

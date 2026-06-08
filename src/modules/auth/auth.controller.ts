@@ -13,14 +13,10 @@ const getCookieOptions = (maxAge: number) => ({
   maxAge,
 });
 
-// একটি মাত্র ফাংশন যা সব রোল হ্যান্ডেল করবে
+// multiple login (VENDOR,CUSTOMER,ADMIN);
 const loginUserReq = catchAsync(async (req: Request, res: Response) => {
-  // মিডলওয়্যার থেকে পাওয়া subdomain এবং vendorId সার্ভিসে পাস করা হচ্ছে
-  const result = await authServices.userLogin(
-    req.body,
-    req.subdomain,
-    req.vendorId as any,
-  );
+   
+  const result = await authServices.userLogin(req.body, req.subdomain);
 
   const payload = {
     userId: result.id,
@@ -28,11 +24,11 @@ const loginUserReq = catchAsync(async (req: Request, res: Response) => {
     email: result.email,
   };
 
-  // টোকেন জেনারেশন
+  // token generation
   const accessToken = signToken(payload);
   const refreshToken = signToken(payload);
 
-  // কুকি সেট করা
+  // set cookie
   res.cookie("accessToken", accessToken, getCookieOptions(1000 * 60 * 60 * 24));
   res.cookie(
     "refreshToken",
@@ -40,10 +36,9 @@ const loginUserReq = catchAsync(async (req: Request, res: Response) => {
     getCookieOptions(1000 * 60 * 60 * 24 * 90),
   );
 
-  // ডাইনামিক সাকসেস মেসেজ ও ডেটা রেসপন্স
+  // dynamic success message
   sendResponse(res, StatusCodes.OK, `${result.role} Login Successful!!`, {
     user: {
-      id: result.id,
       name: result.name,
       role: result.role,
       email: result.email,

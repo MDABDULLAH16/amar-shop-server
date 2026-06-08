@@ -3,35 +3,28 @@ import { verifyToken } from "../utils/jwt";
 import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
 import { prisma } from "../lib/prisma";
- 
+import { catchAsync } from "./errorHandler";
 
-export const authenticate = async (
-  req: Request,
-  _res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
+export const authenticate = catchAsync(
+  async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     const authHeader = req.headers.authorization;
-
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw new AppError(StatusCodes.UNAUTHORIZED, "token not provided");
+    const headerToken = authHeader?.split(' ')[1];
+    const cookieToken = req.cookies?.accessToken;
+    console.log('co',cookieToken);
+    
+    const token = headerToken || cookieToken;
+    if (!token) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, "unauthorized User");
     }
-
-    const token = authHeader.split(" ")[1];
     const payload = verifyToken(token);
-
-    // Confirm the user still exists in DB
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-    });
-    if (!user) throw new AppError(StatusCodes.UNAUTHORIZED, "User not Exist");
+    if (!payload) {
+      throw new AppError(StatusCodes.UNAUTHORIZED, "Invalid User");
+    }
 
     req.user = payload;
     next();
-  } catch (err) {
-    next(err);
-  }
-};
+  },
+);
 
 export const authorizeRoles =
   (...roles: string[]) =>

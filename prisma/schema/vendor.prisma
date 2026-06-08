@@ -18,6 +18,7 @@ model VendorProfile {
   country       String? @default("Bangladesh")
 
   // Banking / payout
+  balance             Float @default(0)
   bankAccountName     String?
   bankAccountNumber   String?
   bankName            String?
