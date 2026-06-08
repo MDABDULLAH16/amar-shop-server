@@ -3,7 +3,7 @@ model AdminProfile {
   userId      String       @unique
   email       String       @unique
   permissions Permission[] //  [MANAGE_USERS, VIEW_ANALYTICS]
-  createdBy   String
+  createdBy   String?
   isVerified  Boolean      @default(false)
 
   // which super admin approve him
