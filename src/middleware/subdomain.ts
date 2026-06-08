@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 
 import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
+import { prisma } from "../lib/prisma";
+import { catchAsync } from "./errorHandler";
 
 export const subdomainMiddleware = async (
   req: Request,
@@ -19,8 +21,10 @@ export const subdomainMiddleware = async (
     const parts = host.split(".");
     const subDomain = parts[0];
 
-    // এটি মেইন ল্যান্ডিং পেজ (যেমন: localhost:3000 বা amarshop.com)
+     
+
     req.subdomain = subDomain;
+    
     return next();
   } catch (error) {
     next(
@@ -30,4 +34,4 @@ export const subdomainMiddleware = async (
       ),
     );
   }
-};
+}

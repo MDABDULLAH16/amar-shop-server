@@ -5,6 +5,7 @@ import { globalErrorHandler } from "./middleware/errorHandler";
 import { notFound } from "./middleware/not-found";
 import router from "./routes/routes";
 import { subdomainMiddleware } from "./middleware/subdomain";
+import cookieParser from "cookie-parser";
 // import userRoutes from "@/modules/user/user.route";
 
 const app = express();
@@ -13,6 +14,7 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 app.use(subdomainMiddleware)
 // Routes

@@ -2,16 +2,15 @@ import { Request, Response, NextFunction } from "express";
 import { verifyToken } from "../utils/jwt";
 import { AppError } from "../utils/appError";
 import { StatusCodes } from "http-status-codes";
-import { prisma } from "../lib/prisma";
 import { catchAsync } from "./errorHandler";
 
 export const authenticate = catchAsync(
   async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     const authHeader = req.headers.authorization;
-    const headerToken = authHeader?.split(' ')[1];
+    const headerToken = authHeader?.split(" ")[1];
+
     const cookieToken = req.cookies?.accessToken;
-    console.log('co',cookieToken);
-    
+
     const token = headerToken || cookieToken;
     if (!token) {
       throw new AppError(StatusCodes.UNAUTHORIZED, "unauthorized User");
