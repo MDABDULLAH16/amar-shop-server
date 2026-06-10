@@ -9,11 +9,13 @@ const userLogin = async (
   payload: Pick<User, "email" | "password">,
   reqSubdomain?: string,
 ) => {
-  const mainDomain = env.DOMAIN;
+  const subdomain = reqSubdomain;
+
   // 1. find user
   const user = await prisma.user.findFirst({
     where: { email: payload.email },
   });
+
   if (!user) {
     throw new AppError(StatusCodes.NOT_FOUND, "User not found");
   }
@@ -26,56 +28,45 @@ const userLogin = async (
   if (!isMatchedPassword) {
     throw new AppError(StatusCodes.BAD_REQUEST, "password don't match");
   }
-
-  // ==========================================
-  // 3. role and subdomain check
-  // ==========================================
-
-  // customer
   if (user.role === Role.CUSTOMER) {
-    if (!reqSubdomain) {
-      throw new AppError(
-        StatusCodes.FORBIDDEN,
-        "Customers can only log in through a vendor subdomain.",
-      );
+    if (!subdomain) {
+      throw new AppError(StatusCodes.NOT_FOUND, "YOur shop not found");
     }
-    //check store and which vendor under your registration
-    const vendorShop = await prisma.vendorProfile.findUnique({
+
+    const checkShop = await prisma.vendorProfile.findUnique({
       where: {
-        subdomain: reqSubdomain,
-      },
-      select: {
-        isApproved: true,
+        subdomain: subdomain,
       },
     });
-    console.log("approved", vendorShop);
-
-    if (!vendorShop?.isApproved) {
-      throw new AppError(
-        StatusCodes.FORBIDDEN,
-        "This store does not approved now",
-      );
-    }
-  }
-
-  if ( user.role === Role.VENDOR) {
-    const checkDomain = reqSubdomain !== mainDomain;
-    if (checkDomain) {
-      throw new AppError(
-        StatusCodes.FORBIDDEN,
-        "You will be login with main domain only",
-      );
+    
+    if (!checkShop?.id) {
+      throw new AppError(StatusCodes.NOT_FOUND, "shop not found for this user");
     }
   }
   if (user.role === Role.ADMIN) {
-    const checkDomain = reqSubdomain !== mainDomain;
-    if (checkDomain) {
+    if (subdomain) {
+      throw new AppError(StatusCodes.CONFLICT, "You only access main domain");
+    }
+    const checkVerifyAdmin = await prisma.adminProfile.findUnique({
+      where: {
+        email: user.email,
+      },
+      select: {
+        isVerified: true,
+      },
+    });
+    if (!checkVerifyAdmin?.isVerified) {
       throw new AppError(
-        StatusCodes.FORBIDDEN,
-        "You will be login with main domain only",
+        StatusCodes.UNAUTHORIZED,
+        "You are not verified yet! please waiting for verify.",
       );
     }
-
+  }
+  if (user.role === Role.VENDOR) {
+    if (subdomain) {
+      console.log("sub domain", subdomain);
+      throw new AppError(StatusCodes.CONFLICT, "admin can access main domain");
+    }
     const checkVerifyAdmin = await prisma.adminProfile.findUnique({
       where: {
         email: user.email,

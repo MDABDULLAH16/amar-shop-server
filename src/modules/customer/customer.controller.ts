@@ -5,7 +5,10 @@ import { sendResponse } from "../../utils/response";
 import { StatusCodes } from "http-status-codes";
 
 const createCustomerReq = catchAsync(async (req: Request, res: Response) => {
-  const result = await customerServices.createCustomer(req.body);
+  const result = await customerServices.createCustomer(
+    req.body,
+    req.subdomain as string,
+  );
   sendResponse(
     res,
     StatusCodes.CREATED,
@@ -14,7 +17,6 @@ const createCustomerReq = catchAsync(async (req: Request, res: Response) => {
   );
 });
 
-
 export const customerController = {
-    createCustomerReq
-}
+  createCustomerReq,
+};

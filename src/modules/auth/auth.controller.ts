@@ -54,6 +54,8 @@ const loginUserReq = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+ 
+
 export const authController = {
   loginUserReq,
 };

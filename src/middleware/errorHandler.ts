@@ -14,7 +14,13 @@ export const globalErrorHandler = (
     err instanceof AppError
       ? err.statusCode
       : StatusCodes.INTERNAL_SERVER_ERROR;
+
   let message = err.message || "Something went wrong";
+
+  // ১. Extract only the vital summary line if it's a Prisma error
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    message = err.message.split("\n").shift()?.trim() || "Database error";
+  }
 
   // ২. Handle known Prisma client errors
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -45,7 +51,6 @@ export const globalErrorHandler = (
         break;
 
       case "P2002":
-        // ডাইনামিকালি কোন ফিল্ড ডুপ্লিকেট হয়েছে তা দেখানোর জন্য (ঐচ্ছিক)
         const target = (err.meta?.target as string[])?.join(", ") || "field";
         message = `Duplicate key error — unique constraint failed on (${target}).`;
         statusCode = StatusCodes.CONFLICT;
@@ -151,6 +156,11 @@ export const globalErrorHandler = (
           (err.meta?.cause as string) ||
           "An operation failed because a required record was not found.";
         statusCode = StatusCodes.NOT_FOUND;
+        break;
+
+      default:
+        // Fallback for any code omitted above
+        statusCode = StatusCodes.BAD_REQUEST;
         break;
     }
   }
