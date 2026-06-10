@@ -9,7 +9,7 @@ export const subdomainMiddleware = async (
   next: NextFunction,
 ) => {
   const host = req.hostname.toLowerCase();
-  console.log("hostt", host);
+ 
 
   // localhost => main domain
   if (host === "localhost") {
@@ -42,7 +42,7 @@ export const subdomainMiddleware = async (
 
   // www.amarshop.com => treat as main domain
   if (subdomain === "www") {
-    console.log("sub www", subdomain);
+   
     return next();
   }
   const vendorPrfile = await prisma.vendorProfile.findUnique({

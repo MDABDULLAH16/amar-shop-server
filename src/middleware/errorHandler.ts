@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from "express";
 import { Prisma } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { AppError } from "../utils/appError";
+import { ZodError } from "zod";
 
 export const globalErrorHandler = (
   err: any,
@@ -16,7 +17,16 @@ export const globalErrorHandler = (
       : StatusCodes.INTERNAL_SERVER_ERROR;
 
   let message = err.message || "Something went wrong";
-
+  if (err instanceof ZodError) {
+    return res.status(400).json({
+      success: false,
+      message: "Validation failed",
+      errors: err.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      })),
+    });
+  }
   // ১. Extract only the vital summary line if it's a Prisma error
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     message = err.message.split("\n").shift()?.trim() || "Database error";

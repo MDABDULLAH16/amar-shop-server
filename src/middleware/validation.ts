@@ -11,7 +11,7 @@ export const validateSchema = (schema: ZodObject) => {
       req.body = validated;
       next();
     } catch (error: any) {
-      return sendError(res, StatusCodes.NOT_FOUND, error.errors[0].message);
+      return next(error);
     }
   };
 };

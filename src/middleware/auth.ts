@@ -9,7 +9,7 @@ export const authenticate = catchAsync(
     const authHeader = req.headers.authorization;
     const headerToken = authHeader?.split(" ")[1];
     const cookieToken = req.cookies?.accessToken;
-    console.log('cc',cookieToken);
+    // console.log('cc',cookieToken);
     
 
     const token = headerToken || cookieToken;
