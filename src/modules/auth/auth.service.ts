@@ -38,7 +38,7 @@ const userLogin = async (
         subdomain: subdomain,
       },
     });
-    
+
     if (!checkShop?.id) {
       throw new AppError(StatusCodes.NOT_FOUND, "shop not found for this user");
     }
@@ -65,21 +65,7 @@ const userLogin = async (
   if (user.role === Role.VENDOR) {
     if (subdomain) {
       console.log("sub domain", subdomain);
-      throw new AppError(StatusCodes.CONFLICT, "admin can access main domain");
-    }
-    const checkVerifyAdmin = await prisma.adminProfile.findUnique({
-      where: {
-        email: user.email,
-      },
-      select: {
-        isVerified: true,
-      },
-    });
-    if (!checkVerifyAdmin?.isVerified) {
-      throw new AppError(
-        StatusCodes.UNAUTHORIZED,
-        "You are not verified yet! please waiting for verify.",
-      );
+      throw new AppError(StatusCodes.CONFLICT, "vendor can access main domain");
     }
   }
 
